@@ -1,52 +1,28 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { ColumnsType } from "antd/lib/table";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IUser } from "../../models/IUser";
 import { IPagination, IResponse } from "../../models/IResponse";
+import { toast } from "react-toastify";
 
 interface UserState {
     users: IUser[],
+    userToEdit: IUser | null,
     pagination: IPagination | null,
-    columns: ColumnsType<IUser>,
     isLoading: boolean,
     isError: boolean
 }
 
 const initialState: UserState = {
     users: [],
+    userToEdit: localStorage.getItem("userToEdit") ? JSON.parse(localStorage.getItem("userToEdit") || "") : null,
     pagination: null,
     isLoading: false,
-    isError: false,
-    columns: [
-        {
-            title: "Name",
-            dataIndex: "name",
-            key: "name"
-        },
-        {
-            title: "Email",
-            dataIndex: "email",
-            key: "email"
-        },
-        {
-            title: "Gender",
-            dataIndex: "gender",
-            key: "gender"
-        },
-        {
-            title: "Status",
-            dataIndex: "status",
-            key: "status"
-        }
-    ]
+    isError: false
 }
 
-export const fetchUsers = createAsyncThunk<IResponse, number, { rejectValue: string }>(
+export const fetchUsers = createAsyncThunk<IResponse, number>(
     'users/fetchUsers',
-    async (page, { rejectWithValue }) => {
+    async (page) => {
         const response = await fetch(`https://gorest.co.in/public/v1/users?page=${page || 1}`);
-        if (!response.ok) {
-            return rejectWithValue('Server Error!');
-        }
 
         const data = await response.json();
 
@@ -54,10 +30,38 @@ export const fetchUsers = createAsyncThunk<IResponse, number, { rejectValue: str
     }
 )
 
+export const editUser = createAsyncThunk<IUser, IUser, { rejectValue: string }>(
+    'users/editUsers',
+    async (user, { rejectWithValue }) => {
+        const response = await fetch(`https://gorest.co.in/public/v1/users/${user.id}`,
+            {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + process.env.REACT_APP_TOKEN || ""
+                },
+                body: JSON.stringify(user)
+            });
+
+        if (!response.ok) {
+            return rejectWithValue("Something went wrong");
+        }
+
+        const data = await response.json();
+
+        return data
+    }
+)
+
 export const userSlice = createSlice({
     name: "users",
     initialState,
-    reducers: {},
+    reducers: {
+        addUserToEdit(state, action: PayloadAction<IUser>) {
+            state.userToEdit = action.payload;
+            localStorage.setItem("userToEdit", JSON.stringify(state.userToEdit));
+        }
+    },
     extraReducers: (builder) => {
         builder
             .addCase(fetchUsers.pending, (state) => {
@@ -72,7 +76,28 @@ export const userSlice = createSlice({
                 state.isLoading = false;
                 state.isError = false;
             })
+            .addCase(fetchUsers.rejected, (state) => {
+                state.isLoading = false;
+                state.isError = true;
+            })
+            .addCase(editUser.fulfilled, (state) => {
+                toast.success("Data have been edited successfully", {
+                    position: "bottom-left"
+                })
+            })
+            .addCase(editUser.rejected, (state, action) => {
+                toast.error(action.payload, {
+                    position: "bottom-left"
+                })
+            })
+            .addCase(editUser.pending, (state) => {
+                toast.info("Data have sended", {
+                    position: "bottom-left"
+                })
+            })
     }
 })
+
+export const { addUserToEdit } = userSlice.actions;
 
 export default userSlice.reducer;
