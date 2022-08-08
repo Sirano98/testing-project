@@ -13,8 +13,8 @@ export const FilterInput: FC = () => {
     }
 
     return (
-        <Form>
-            <Form.Item name='gender' label='Gender' initialValue={gender}>
+        <Form labelCol={{ span: 15 }}>
+            <Form.Item label='Gender' initialValue={gender}>
                 <Select value={gender} onChange={onFilterChange}>
                     <Select.Option value='male'>Male</Select.Option>
                     <Select.Option value='female'>Female</Select.Option>

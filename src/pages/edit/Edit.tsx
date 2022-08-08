@@ -1,6 +1,7 @@
 import { Button, Col, Form, Input, Row, Select } from "antd";
 import { FC, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Layout } from "../../components/layout/Layout";
 import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import { IUser } from "../../models/IUser";
 import { editUser } from "../../store/reducers/usersSlice";
@@ -38,57 +39,64 @@ export const Edit: FC = () => {
     }
 
     return (
-        <Row>
-            <Col span={12} offset={6}>
-                <Form
-                    labelCol={{ span: 8 }}
-                    wrapperCol={{ span: 16 }}
-                    autoComplete='off'
-                    onFinish={onFinish}
-                    form={form}>
+        <Layout>
+            <Form
+                autoComplete='off'
+                onFinish={onFinish}
+                form={form}>
 
-                    <Form.Item
-                        name='name'
-                        label='Name'
-                        initialValue={name}
-                        rules={[
-                            { whitespace: true },
-                            { min: 3 }
-                        ]}>
-                        <Input value={name} onChange={(e) => setName(e.target.value)} />
-                    </Form.Item>
+                <Form.Item
+                    name='name'
+                    label='Name'
+                    initialValue={name}
+                    rules={[
+                        { whitespace: true },
+                        { min: 3 },
+                        {
+                            required: true,
+                            message: 'Please input name',
+                        }
+                    ]}>
+                    <Input value={name} onChange={(e) => setName(e.target.value)} />
+                </Form.Item>
 
-                    <Form.Item name='email' label='Email' initialValue={email}>
-                        <Input value={email} onChange={(e) => setEmail(e.target.value)} />
-                    </Form.Item>
+                <Form.Item
+                    name='email'
+                    label='Email'
+                    initialValue={email}
+                    rules={[
+                        {
+                            type: 'email',
+                            message: 'The input is not valid E-mail!',
+                        },
+                        {
+                            required: true,
+                            message: 'Please input E-mail!',
+                        }
+                    ]}>
+                    <Input value={email} onChange={(e) => setEmail(e.target.value)} />
+                </Form.Item>
 
-                    <Form.Item name='gender' label='Gender' initialValue={gender}>
-                        <Select value={gender} onChange={(e) => setGender(e)}>
-                            <Select.Option value='male'>Male</Select.Option>
-                            <Select.Option value='female'>Female</Select.Option>
-                        </Select>
-                    </Form.Item>
+                <Form.Item name='gender' label='Gender' initialValue={gender}>
+                    <Select value={gender} onChange={(e) => setGender(e)}>
+                        <Select.Option value='male'>Male</Select.Option>
+                        <Select.Option value='female'>Female</Select.Option>
+                    </Select>
+                </Form.Item>
 
-                    <Form.Item name='status' label='Status' initialValue={status}>
-                        <Select value={status} onChange={(e) => setStatus(e)}>
-                            <Select.Option value='active'>Active</Select.Option>
-                            <Select.Option value='inactive'>Inactive</Select.Option>
-                        </Select>
-                    </Form.Item>
+                <Form.Item name='status' label='Status' initialValue={status}>
+                    <Select value={status} onChange={(e) => setStatus(e)}>
+                        <Select.Option value='active'>Active</Select.Option>
+                        <Select.Option value='inactive'>Inactive</Select.Option>
+                    </Select>
+                </Form.Item>
 
-                    <Form.Item >
-                        <Button type="primary" htmlType="submit">Save</Button>
-                    </Form.Item>
-
-                    <Form.Item >
-                        <Button type="primary" onClick={discardChages} >Discard</Button>
-                    </Form.Item>
-
-                    <Form.Item >
-                        <Button type="primary" onClick={() => navigate('/')} >Back</Button>
-                    </Form.Item>
-                </Form>
-            </Col>
-        </Row>
+                <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+                    <Button type="primary" htmlType="submit">Save</Button>
+                    <Button type="primary" onClick={discardChages} >Discard</Button>
+                    <Button type="primary" onClick={() => navigate('/')} >Back</Button>
+                </Form.Item>
+            </Form>
+        </Layout>
     )
 }

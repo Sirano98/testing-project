@@ -1,5 +1,4 @@
-import { Table } from "antd";
-import { ColumnsType } from "antd/lib/table";
+import Table, { ColumnsType } from "antd/lib/table";
 import { FC, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
@@ -19,7 +18,7 @@ export const UsersTable: FC = () => {
             title: "Name",
             dataIndex: "name",
             key: "name",
-            render: text => <Link to="/edit">{text}</Link>,
+            render: (text) => <Link to="/edit">{text}</Link>,
             onCell: (user) => {
                 return {
                     onClick: () => {
