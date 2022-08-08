@@ -83,6 +83,10 @@ export const Edit: FC = () => {
                     <Form.Item >
                         <Button type="primary" onClick={discardChages} >Discard</Button>
                     </Form.Item>
+
+                    <Form.Item >
+                        <Button type="primary" onClick={() => navigate('/')} >Back</Button>
+                    </Form.Item>
                 </Form>
             </Col>
         </Row>

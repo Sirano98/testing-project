@@ -5,6 +5,8 @@ import { toast } from "react-toastify";
 
 interface UserState {
     users: IUser[],
+    filteredUsers: IUser[],
+    filterValue: string,
     userToEdit: IUser | null,
     pagination: IPagination | null,
     isLoading: boolean,
@@ -13,6 +15,8 @@ interface UserState {
 
 const initialState: UserState = {
     users: [],
+    filteredUsers: [],
+    filterValue: "gender",
     userToEdit: localStorage.getItem("userToEdit") ? JSON.parse(localStorage.getItem("userToEdit") || "") : null,
     pagination: null,
     isLoading: false,
@@ -25,7 +29,6 @@ export const fetchUsers = createAsyncThunk<IResponse, number>(
         const response = await fetch(`https://gorest.co.in/public/v1/users?page=${page || 1}`);
 
         const data = await response.json();
-
         return data;
     }
 )
@@ -60,6 +63,19 @@ export const userSlice = createSlice({
         addUserToEdit(state, action: PayloadAction<IUser>) {
             state.userToEdit = action.payload;
             localStorage.setItem("userToEdit", JSON.stringify(state.userToEdit));
+        },
+        filterUsers(state) {
+            state.filteredUsers = state.users.filter((user) => {
+                return user.gender === state.filterValue
+            })
+
+
+            if (!state.filteredUsers.length) {
+                state.filteredUsers = state.users
+            }
+        },
+        setFilterValur(state, action: PayloadAction<string>) {
+            state.filterValue = action.payload;
         }
     },
     extraReducers: (builder) => {
@@ -98,6 +114,6 @@ export const userSlice = createSlice({
     }
 })
 
-export const { addUserToEdit } = userSlice.actions;
+export const { addUserToEdit, filterUsers, setFilterValur } = userSlice.actions;
 
 export default userSlice.reducer;
